@@ -247,6 +247,49 @@ namespace XPlaneConnector
         }
 
         /// <summary>
+        /// Subscribe to a DataRef, notification will be sent every time the value changes
+        /// </summary>
+        /// <param name="dataref">DataRef to subscribe to</param>
+        /// <param name="frequency">Times per seconds X-Plane will be seding this value</param>
+        /// <param name="onchange">Callback invoked every time a change in the value is detected</param>
+        public void Subscribe(FloatArrayDataRefElement dataref, int frequency = -1, Action<FloatArrayDataRefElement, List<float>> onchange = null)
+        {
+
+
+            if (dataref == null)
+                throw new ArgumentNullException(nameof(dataref));
+
+            dataref.OnValueChange += (e, v) =>
+            {
+                onchange(e, v);
+            };
+
+            var wT3NumberOfAircraftRendered = global::XPlaneConnector.DataRefs.WT3NumberOfAircraftRendered;
+
+            Subscribe(wT3NumberOfAircraftRendered, frequency, (element, aircraftCount) =>
+            {
+
+                dataref.ArrayLength = (int)aircraftCount;
+                for (var c = 0; c < aircraftCount; c++)
+                {
+                    var arrayElementDataRef = new DataRefElement
+                    {
+                        DataRef = $"{dataref.DataRef}[{c}]",
+                        Description = ""
+                    };
+
+                    var currentIndex = c;
+                    Subscribe(arrayElementDataRef, frequency, (e, v) =>
+                    {
+                        dataref.Update(currentIndex, v);
+                    });
+                }
+            });
+
+            
+        }
+
+        /// <summary>
         /// Deprecated, this method has no effect
         /// </summary>
         /// <param name="dataref"></param>

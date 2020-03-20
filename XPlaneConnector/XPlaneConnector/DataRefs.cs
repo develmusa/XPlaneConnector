@@ -41809,6 +41809,119 @@ namespace XPlaneConnector
             }
         }
 
+        public static StringDataRefElement WT3AircraftIdentifier
+        {
+            get
+            {
+                return new StringDataRefElement
+                {
+                    DataRef = "cjs/world_traffic/id",
+                    Frequency = DefaultFrequency,
+                    StringLenght = 40
+                };
+            }
+        }
+
+
+
+        public static DataRefElement WT3NumberOfAircraftRendered
+        {
+            get
+            {
+                return new DataRefElement
+                {
+                    DataRef = "cjs/world_traffic/num_aircraft",
+                    Units = "Count",
+                    Description = "Number of aircraft currently being rendered",
+                    Frequency = DefaultFrequency
+                };
+            }
+        }
+
+        public static StringDataRefElement WT3AircraftTrackID
+        {
+            get
+            {
+                return new StringDataRefElement
+                {
+                    DataRef = "cjs/world_traffic/aircraft_trackcam_id",
+                    Frequency = DefaultFrequency,
+                    StringLenght = 40
+                };
+            }
+        }
+
+
+        public static FloatArrayDataRefElement WT3AltitudesOfAllAircraft
+        {
+            get
+            {
+                return new FloatArrayDataRefElement
+                {
+                    DataRef = "cjs/world_traffic/alt_asl",
+                    Units = "feet",
+                    Description = "Altitudes of all aircraf (ASL)",
+                    Frequency = DefaultFrequency,
+                };
+            }
+        }
+
+        public static FloatArrayDataRefElement WT3SpeedsOfAllAircraft
+        {
+            get
+            {
+                return new FloatArrayDataRefElement
+                {
+                    DataRef = "cjs/world_traffic/speed_kias",
+                    Units = "Knots",
+                    Description = "Speeds of all aircraft (kias)",
+                    Frequency = DefaultFrequency,
+                };
+            }
+        }
+
+        public static FloatArrayDataRefElement WT3HeadingOfAllAircraft
+        {
+            get
+            {
+                return new FloatArrayDataRefElement
+                {
+                    DataRef = "cjs/world_traffic/heading_degT",
+                    Units = "Degree",
+                    Description = "Heading of all aircraft (true)",
+                    Frequency = DefaultFrequency,
+                };
+            }
+        }
+
+        public static FloatArrayDataRefElement WT3LatitudesOfAllAircraft
+        {
+            get
+            {
+                return new FloatArrayDataRefElement
+                {
+                    DataRef = "cjs/world_traffic/aircraft_lat",
+                    Units = "Todo",
+                    Description = "Latitude position of all aircraft",
+                    Frequency = DefaultFrequency,
+                };
+            }
+        }
+
+        public static FloatArrayDataRefElement WT3LongitudesOfAllAircraft
+        {
+            get
+            {
+                return new FloatArrayDataRefElement
+                {
+                    DataRef = "cjs/world_traffic/aircraft_lon",
+                    Units = "Todo",
+                    Description = "Longitude position of all aircraft",
+                    Frequency = DefaultFrequency,
+                };
+            }
+        }
+
 
     }
 }
