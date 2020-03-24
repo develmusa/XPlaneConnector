@@ -37,11 +37,14 @@ namespace XPlaneConnector
                     Values.Add(value);
                 }
 
-                var current = Values[index];
-                if (Math.Abs(current - value) > 0.001f)
+                if (index < Values.Count)
                 {
-                    Values[index] = value;
-                    fireEvent = true;
+                    var current = Values[index];
+                    if (Math.Abs(current - value) > 0.001f)
+                    {
+                        Values[index] = value;
+                        fireEvent = true;
+                    }
                 }
 
                 if (IsCompletelyInitialized && fireEvent)
