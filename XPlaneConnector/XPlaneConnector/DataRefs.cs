@@ -10,7 +10,7 @@ namespace XPlaneConnector
         public int RevBuild { get { return revBuild; } }
 
         private static int DefaultFrequency = 5;
-
+        #region X-Plane
         public static DataRefElement AircraftAutopilotVviStepFt
         {
             get
@@ -41821,8 +41821,9 @@ namespace XPlaneConnector
                 };
             }
         }
-
-
+#endregion
+        #region World Traffic 3
+        // DataRef Reference: http://www.classicjetsims.com/downloads/WorldTraffic.pdf
 
         public static DataRefElement WT3NumberOfAircraftRendered
         {
@@ -41838,19 +41839,47 @@ namespace XPlaneConnector
             }
         }
 
-        public static StringDataRefElement WT3AircraftTrackID
+        public static DataRefElement WT3AircraftTrackID
         {
             get
             {
-                return new StringDataRefElement
+                return new DataRefElement
                 {
                     DataRef = "cjs/world_traffic/aircraft_trackcam_id",
+                    Units = "ID",
+                    Description = "Aircraft id currently being viewed by track camera",
                     Frequency = DefaultFrequency,
-                    StringLenght = 40
                 };
             }
         }
 
+        public static IntegerArrayDataRefElement WT3TypesOfAllAircraft
+        {
+            get
+            {
+                return new IntegerArrayDataRefElement
+                {
+                    DataRef = "cjs/world_traffic/aircraft_type",
+                    Units = "Type", // see Apendix A3
+                    Description = "Aircraft Type",
+                    Frequency = DefaultFrequency,
+                };
+            }
+        }
+
+        public static IntegerArrayDataRefElement WT3IDsOfAllAircraft
+        {
+            get
+            {
+                return new IntegerArrayDataRefElement
+                {
+                    DataRef = "cjs/world_traffic/id",
+                    Units = "ID",
+                    Description = "IDs of all aircraft",
+                    Frequency = DefaultFrequency,
+                };
+            }
+        }
 
         public static FloatArrayDataRefElement WT3AltitudesOfAllAircraft
         {
@@ -41860,7 +41889,7 @@ namespace XPlaneConnector
                 {
                     DataRef = "cjs/world_traffic/alt_asl",
                     Units = "feet",
-                    Description = "Altitudes of all aircraf (ASL)",
+                    Description = "Altitudes of all aircraft (ASL)",
                     Frequency = DefaultFrequency,
                 };
             }
@@ -41922,6 +41951,6 @@ namespace XPlaneConnector
             }
         }
 
-
+        #endregion
     }
 }
