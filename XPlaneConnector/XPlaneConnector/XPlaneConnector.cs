@@ -139,7 +139,8 @@ namespace XPlaneConnector
                     {
                         var value = BitConverter.ToSingle(buffer, pos);
                         pos += 4;
-                        foreach (var dr in DataRefs)
+                        var tempDataRefs = DataRefs.ToList();
+                        foreach (var dr in tempDataRefs)
                             if (dr.Update(id, value))
                                 OnDataRefReceived?.Invoke(dr);
                     }
