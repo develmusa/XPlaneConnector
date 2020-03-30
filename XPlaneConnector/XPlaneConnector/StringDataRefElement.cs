@@ -1,34 +1,35 @@
 ﻿namespace XPlaneConnector
 {
-    public class StringDataRefElement
+    public class StringDataRefElement : IDataRefElement
     {
         private static readonly object lockElement = new object();
         public string DataRef { get; set; }
         public int Frequency { get; set; }
         public int StringLenght { get; set; }
         public string Value { get; set; }
-
-        private int CharactersInitialized;
+        public int IsInitialized { get; set; }
+        public string Units { get; set; }
+        public string Description { get; set; }
 
         public bool IsCompletelyInitialized
         {
             get
             {
-                return CharactersInitialized >= StringLenght;
+                return IsInitialized >= StringLenght;
             }
         }
 
         public delegate void NotifyChangeHandler(StringDataRefElement sender, string newValue);
         public event NotifyChangeHandler OnValueChange;
 
-        public void Update(int index, char character)
+        public bool Update(int index, char character)
         {
             lock (lockElement)
             {
                 var fireEvent = !IsCompletelyInitialized;
 
                 if (!IsCompletelyInitialized)
-                    CharactersInitialized++;
+                    IsInitialized++;
 
                 if (character > 0)
                 {
@@ -46,14 +47,22 @@
                 if (IsCompletelyInitialized && fireEvent)
                 {
                     OnValueChange?.Invoke(this, Value);
-                    CharactersInitialized = 0;
+                    IsInitialized = 0;
+                    return true;
                 }
+
+                return false;
             }
+        }
+
+        public bool Update(int id, float value)
+        {
+            throw new System.NotImplementedException();
         }
 
         public StringDataRefElement()
         {
-            CharactersInitialized = 0;
+            IsInitialized = 0;
             Value = "";
         }
     }

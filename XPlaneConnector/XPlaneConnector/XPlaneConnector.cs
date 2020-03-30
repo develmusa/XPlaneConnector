@@ -27,13 +27,13 @@ namespace XPlaneConnector
         public delegate void RawReceiveHandler(string raw);
         public event RawReceiveHandler OnRawReceive;
 
-        public delegate void DataRefReceived(DataRefElement dataRef);
+        public delegate void DataRefReceived(FloatDataRefElement dataRef);
         public event DataRefReceived OnDataRefReceived;
 
         public delegate void LogHandler(string message);
         public event LogHandler OnLog;
 
-        private List<DataRefElement> DataRefs;
+        private List<IDataRefElement> DataRefs;
 
         public DateTime LastReceive { get; internal set; }
         public IEnumerable<byte> LastBuffer { get; internal set; }
@@ -53,7 +53,7 @@ namespace XPlaneConnector
         public XPlaneConnector(string ip = "127.0.0.1", int xplanePort = 49000)
         {
             XPlaneEP = new IPEndPoint(IPAddress.Parse(ip), xplanePort);
-            DataRefs = new List<DataRefElement>();
+            DataRefs = new List<IDataRefElement>();
         }
 
         /// <summary>
@@ -91,8 +91,13 @@ namespace XPlaneConnector
                 while (!token.IsCancellationRequested)
                 {
                     foreach (var dr in DataRefs)
-                        if (dr.Age > MaxDataRefAge)
-                            RequestDataRef(dr);
+                        if (dr is FloatDataRefElement)
+                        {
+                            var fdr = (FloatDataRefElement)dr;
+                            if (fdr.Age > MaxDataRefAge)
+                                RequestDataRef(fdr);
+                        }
+
 
                     await Task.Delay(CheckInterval_ms).ConfigureAwait(false);
                 }
@@ -142,7 +147,7 @@ namespace XPlaneConnector
                         var tempDataRefs = DataRefs.ToList();
                         foreach (var dr in tempDataRefs)
                             if (dr.Update(id, value))
-                                OnDataRefReceived?.Invoke(dr);
+                                OnDataRefReceived?.Invoke(dr as FloatDataRefElement);
                     }
                     catch (ArgumentException ex)
                     {
@@ -198,7 +203,7 @@ namespace XPlaneConnector
         /// <param name="dataref">DataRef to subscribe to</param>
         /// <param name="frequency">Times per seconds X-Plane will be seding this value</param>
         /// <param name="onchange">Callback invoked every time a change in the value is detected</param>
-        public void Subscribe(DataRefElement dataref, int frequency = -1, Action<DataRefElement, float> onchange = null)
+        public void Subscribe(FloatDataRefElement dataref, int frequency = -1, Action<FloatDataRefElement, float> onchange = null)
         {
             if (dataref == null)
                 throw new ArgumentNullException(nameof(dataref));
@@ -232,7 +237,7 @@ namespace XPlaneConnector
 
             for (var c = 0; c < dataref.StringLenght; c++)
             {
-                var arrayElementDataRef = new DataRefElement
+                var arrayElementDataRef = new FloatDataRefElement
                 {
                     DataRef = $"{dataref.DataRef}[{c}]",
                     Description = ""
@@ -265,7 +270,7 @@ namespace XPlaneConnector
                 onchange(e, v);
             };
 
-            var wT3NumberOfAircraftRendered = global::XPlaneConnector.DataRefs.WT3NumberOfAircraftRendered;
+            var wT3NumberOfAircraftRendered = (FloatDataRefElement)global::XPlaneConnector.DataRefs.WT3NumberOfAircraftRendered;
 
             Subscribe(wT3NumberOfAircraftRendered, frequency, (element, aircraftCount) =>
             {
@@ -273,7 +278,7 @@ namespace XPlaneConnector
                 dataref.ArrayLength = (int)aircraftCount;
                 for (var c = 0; c < aircraftCount; c++)
                 {
-                    var arrayElementDataRef = new DataRefElement
+                    var arrayElementDataRef = new FloatDataRefElement
                     {
                         DataRef = $"{dataref.DataRef}[{c}]",
                         Description = ""
@@ -306,7 +311,7 @@ namespace XPlaneConnector
                 onchange(e, v);
             };
 
-            var wT3NumberOfAircraftRendered = global::XPlaneConnector.DataRefs.WT3NumberOfAircraftRendered;
+            var wT3NumberOfAircraftRendered = (FloatDataRefElement)global::XPlaneConnector.DataRefs.WT3NumberOfAircraftRendered;
 
             Subscribe(wT3NumberOfAircraftRendered, frequency, (element, aircraftCount) =>
             {
@@ -314,7 +319,7 @@ namespace XPlaneConnector
                 dataref.ArrayLength = (int)aircraftCount;
                 for (var c = 0; c < aircraftCount; c++)
                 {
-                    var arrayElementDataRef = new DataRefElement
+                    var arrayElementDataRef = new FloatDataRefElement
                     {
                         DataRef = $"{dataref.DataRef}[{c}]",
                         Description = ""
@@ -343,11 +348,11 @@ namespace XPlaneConnector
         /// <param name="dataref"></param>
         /// <param name="frequency"></param>
         [Obsolete]
-        private void Subscribe(DataRefElement dataref, int frequency = -1)
+        private void Subscribe(FloatDataRefElement dataref, int frequency = -1)
         {
         }
 
-        private void RequestDataRef(DataRefElement element)
+        private void RequestDataRef(FloatDataRefElement element)
         {
             if (client != null)
             {
@@ -376,7 +381,7 @@ namespace XPlaneConnector
             {
                 var dg = new XPDatagram();
                 dg.Add("RREF");
-                dg.Add(dr.Id);
+                //dg.Add(dr.Id);
                 dg.Add(0);
                 dg.Add(dataref);
                 dg.FillTo(413);
@@ -393,7 +398,7 @@ namespace XPlaneConnector
         /// </summary>
         /// <param name="dataref">DataRef that will be changed</param>
         /// <param name="value">New value of the DataRef</param>
-        public void SetDataRefValue(DataRefElement dataref, float value)
+        public void SetDataRefValue(FloatDataRefElement dataref, float value)
         {
             if (dataref == null)
                 throw new ArgumentNullException(nameof(dataref));

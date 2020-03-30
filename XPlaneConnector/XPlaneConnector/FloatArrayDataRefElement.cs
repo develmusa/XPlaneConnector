@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace XPlaneConnector
 {
-    public class FloatArrayDataRefElement
+    public class FloatArrayDataRefElement : IDataRefElement
     {
         private static readonly object lockElement = new object();
         public string DataRef { get; set; }
@@ -12,22 +12,21 @@ namespace XPlaneConnector
         public string Units { get; set; }
         public string Description { get; set; }
         public List<float> Values { get; set; }
+        public int IsInitialized { get; set; }
 
-        private int ValuesInitialized;
-
-        public bool IsCompletelyInitialized => ValuesInitialized >= ArrayLength;
+        public bool IsCompletelyInitialized => IsInitialized >= ArrayLength;
 
         public delegate void NotifyChangeHandler(FloatArrayDataRefElement sender, List<float> newValue);
         public event NotifyChangeHandler OnValueChange;
 
-        public void Update(int index, float value)
+        public bool Update(int index, float value)
         {
             lock (lockElement)
             {
                 var fireEvent = !IsCompletelyInitialized;
 
                 if (!IsCompletelyInitialized)
-                    ValuesInitialized++;
+                    IsInitialized++;
 
                 //Values.Add(value);
                 //fireEvent = true;
@@ -50,14 +49,17 @@ namespace XPlaneConnector
                 if (IsCompletelyInitialized && fireEvent)
                 {
                     OnValueChange?.Invoke(this, Values);
-                    ValuesInitialized = 0;
+                    IsInitialized = 0;
+                    return true;
                 }
+
+                return false;
             }
         }
 
         public FloatArrayDataRefElement()
         {
-            ValuesInitialized = 0;
+            IsInitialized = 0;
             Values = new List<float>();
         }
     }
