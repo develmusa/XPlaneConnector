@@ -7,6 +7,6 @@
         int IsInitialized { get; set; }
         string Units { get; set; }
         string Description { get; set; }
-        bool Update(int id, float value);
+        bool Update<T>(int id, T value);
     }
 }

@@ -1,4 +1,7 @@
-﻿namespace XPlaneConnector
+﻿using System;
+using System.Runtime.CompilerServices;
+
+namespace XPlaneConnector
 {
     public class StringDataRefElement : IDataRefElement
     {
@@ -16,48 +19,52 @@
             get
             {
                 return IsInitialized >= StringLenght;
+                Update(2,'a');
             }
         }
 
         public delegate void NotifyChangeHandler(StringDataRefElement sender, string newValue);
         public event NotifyChangeHandler OnValueChange;
 
-        public bool Update(int index, char character)
+
+        public bool Update<T>(int index, T input)
         {
             lock (lockElement)
             {
-                var fireEvent = !IsCompletelyInitialized;
-
-                if (!IsCompletelyInitialized)
-                    IsInitialized++;
-
-                if (character > 0)
+                if (typeof(T) == typeof(char))
                 {
-                    if (Value.Length <= index)
-                        Value = Value.PadRight(index + 1, ' ');
+                    char character = Convert.ToChar(input);
 
-                    var current = Value[index];
-                    if (current != character)
-                    {
-                        Value = Value.Remove(index, 1).Insert(index, character.ToString());
-                        fireEvent = true;
-                    }
+                    var fireEvent = !IsCompletelyInitialized;
+
+                        if (!IsCompletelyInitialized)
+                            IsInitialized++;
+
+                        if (character > 0)
+                        {
+                            if (Value.Length <= index)
+                                Value = Value.PadRight(index + 1, ' ');
+
+                            var current = Value[index];
+                            if (current != character)
+                            {
+                                Value = Value.Remove(index, 1).Insert(index, character.ToString());
+                                fireEvent = true;
+                            }
+                        }
+
+                        if (IsCompletelyInitialized && fireEvent)
+                        {
+                            OnValueChange?.Invoke(this, Value);
+                            IsInitialized = 0;
+                            return true;
+                        }
+                    
                 }
 
-                if (IsCompletelyInitialized && fireEvent)
-                {
-                    OnValueChange?.Invoke(this, Value);
-                    IsInitialized = 0;
-                    return true;
-                }
 
                 return false;
             }
-        }
-
-        public bool Update(int id, float value)
-        {
-            throw new System.NotImplementedException();
         }
 
         public StringDataRefElement()

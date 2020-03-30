@@ -38,18 +38,23 @@ namespace XPlaneConnector
             }
         }
 
-        public bool Update(int id, float value)
+        public bool Update<T>(int id, T input)
         {
-            if (id == Id)
+            if (typeof(T) == typeof(float))
             {
-                LastUpdate = DateTime.Now;
+                float value = Convert.ToSingle(input);
 
-                if (value != Value)
+                if (id == Id)
                 {
-                    Value = value;
-                    IsInitialized = 1;
-                    OnValueChange?.Invoke(this, Value);
-                    return true;
+                    LastUpdate = DateTime.Now;
+
+                    if (value != Value)
+                    {
+                        Value = value;
+                        IsInitialized = 1;
+                        OnValueChange?.Invoke(this, Value);
+                        return true;
+                    }
                 }
             }
 

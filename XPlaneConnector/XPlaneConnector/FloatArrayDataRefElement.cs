@@ -19,38 +19,43 @@ namespace XPlaneConnector
         public delegate void NotifyChangeHandler(FloatArrayDataRefElement sender, List<float> newValue);
         public event NotifyChangeHandler OnValueChange;
 
-        public bool Update(int index, float value)
+        public bool Update<T>(int index, T input)
         {
             lock (lockElement)
             {
-                var fireEvent = !IsCompletelyInitialized;
-
-                if (!IsCompletelyInitialized)
-                    IsInitialized++;
-
-                //Values.Add(value);
-                //fireEvent = true;
-
-                if (Values.Count <= index)
+                if (typeof(T) == typeof(float))
                 {
-                    Values.Add(value);
-                }
+                    var value = Convert.ToSingle(input);
 
-                if (index < Values.Count)
-                {
-                    var current = Values[index];
-                    if (Math.Abs(current - value) > 0.001f)
+                    var fireEvent = !IsCompletelyInitialized;
+
+                    if (!IsCompletelyInitialized)
+                        IsInitialized++;
+
+                    //Values.Add(value);
+                    //fireEvent = true;
+
+                    if (Values.Count <= index)
                     {
-                        Values[index] = value;
-                        fireEvent = true;
+                        Values.Add(value);
                     }
-                }
 
-                if (IsCompletelyInitialized && fireEvent)
-                {
-                    OnValueChange?.Invoke(this, Values);
-                    IsInitialized = 0;
-                    return true;
+                    if (index < Values.Count)
+                    {
+                        var current = Values[index];
+                        if (Math.Abs(current - value) > 0.001f)
+                        {
+                            Values[index] = value;
+                            fireEvent = true;
+                        }
+                    }
+
+                    if (IsCompletelyInitialized && fireEvent)
+                    {
+                        OnValueChange?.Invoke(this, Values);
+                        IsInitialized = 0;
+                        return true;
+                    }
                 }
 
                 return false;
